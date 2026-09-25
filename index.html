@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRAIN ADDA - Play Ludo Challenges & Win</title>
+  <meta name="description" content="Play online ludo challenges, 1v1 matches and classic tournaments on Grain Adda.">
+
+  <style>
+    :root {
+      --primary: #f59e0b;
+      --primary-hover: #d97706;
+      --bg-dark: #0b0f19;
+      --card-bg: #151d2d;
+      --accent-green: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #26334a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text); padding-bottom: 70px; }
+    header { background: #111827; padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
+    .header-btns { display: flex; gap: 0.5rem; }
+    .btn { padding: 0.5rem 0.9rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.85rem; }
+    .btn-pay { background: var(--accent-green); color: #000; }
+    .btn-login { background: var(--primary); color: #000; }
+    .search-box { max-width: 600px; margin: 1.5rem auto 1rem; padding: 0 1rem; }
+    .search-input { width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: #fff; font-size: 1rem; outline: none; }
+    .container { max-width: 600px; margin: 0 auto; padding: 0 1rem; }
+    .section-title { font-size: 1.1rem; margin: 1.2rem 0 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+    .game-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+    .player-details h4 { font-size: 1rem; color: #fff; }
+    .player-details p { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .game-prize { text-align: right; }
+    .prize-amount { color: var(--accent-green); font-weight: bold; font-size: 1.1rem; }
+    .btn-play { background: var(--primary); color: #000; padding: 0.4rem 1rem; border-radius: 5px; border: none; font-weight: 700; margin-top: 0.3rem; cursor: pointer; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 200; padding: 1rem; }
+    .modal { background: #1e293b; padding: 1.5rem; border-radius: 12px; width: 100%; max-width: 380px; position: relative; }
+    .close-btn { position: absolute; top: 0.8rem; right: 1rem; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+    .form-group { margin-top: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .form-group input { width: 100%; padding: 0.7rem; background: #0f172a; border: 1px solid var(--border); border-radius: 6px; color: #fff; outline: none; }
+    .submit-btn { width: 100%; margin-top: 1.2rem; padding: 0.8rem; background: var(--primary); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
+    .qr-container { text-align: center; margin: 1rem 0; background: #fff; padding: 1rem; border-radius: 8px; color: #000; }
+    .qr-container img { width: 180px; height: 180px; }
+    .upi-id-box { font-weight: bold; color: #0f172a; margin-top: 0.5rem; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">🌾 GRAIN ADDA</div>
+    <div class="header-btns">
+      <button class="btn btn-pay" onclick="openModal('paymentModal')">💳 Pay / Add Cash</button>
+      <button class="btn btn-login" onclick="openModal('loginModal')">Login</button>
+    </div>
+  </header>
+
+  <div class="search-box">
+    <input type="number" id="gameSearch" class="search-input" placeholder="🔍 Search game amount (e.g. 50, 100)..." onkeyup="filterGames()">
+  </div>
+
+  <div class="container">
+    <div class="section-title">
+      <span>Available Challenges</span>
+      <span id="matchCount">4 Matches Found</span>
+    </div>
+
+    <div id="gamesContainer">
+      <div class="game-card" data-amount="50">
+        <div class="player-details">
+          <h4>Player: Rahul_Ludo</h4>
+          <p>Entry Fee: <strong>₹50</strong> | Mode: Classic</p>
+        </div>
+        <div class="game-prize">
+          <div class="prize-amount">Win: ₹90</div>
+          <button class="btn-play" onclick="joinGame(50, 'Rahul_Ludo')">Play</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-amount="100">
+        <div class="player-details">
+          <h4>Player: Aman_King</h4>
+          <p>Entry Fee: <strong>₹100</strong> | Mode: 1v1 Quick</p>
+        </div>
+        <div class="game-prize">
+          <div class="prize-amount">Win: ₹180</div>
+          <button class="btn-play" onclick="joinGame(100, 'Aman_King')">Play</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-amount="200">
+        <div class="player-details">
+          <h4>Player: Vicky_Star</h4>
+          <p>Entry Fee: <strong>₹200</strong> | Mode: Classic</p>
+        </div>
+        <div class="game-prize">
+          <div class="prize-amount">Win: ₹360</div>
+          <button class="btn-play" onclick="joinGame(200, 'Vicky_Star')">Play</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-amount="500">
+        <div class="player-details">
+          <h4>Player: Boss_007</h4>
+          <p>Entry Fee: <strong>₹500</strong> | Mode: Pro Match</p>
+        </div>
+        <div class="game-prize">
+          <div class="prize-amount">Win: ₹900</div>
+          <button class="btn-play" onclick="joinGame(500, 'Boss_007')">Play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+      <h3>Login / Sign Up</h3>
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="userName" placeholder="Enter full name">
+      </div>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="tel" id="userPhone" placeholder="Enter 10-digit number" maxlength="10">
+      </div>
+      <button class="submit-btn" onclick="submitLogin()">Submit & Send on WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div class="modal-overlay" id="paymentModal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
+      <h3>Scan & Pay</h3>
+      
+      <div class="qr-container">
+        <!-- अपनी असली UPI ID यहाँ बदल सकते हैं -->
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=your-upi-id@oksbi&pn=GrainAdda" alt="QR Code">
+        <div class="upi-id-box">UPI ID: your-upi-id@oksbi</div>
+      </div>
+
+      <div class="form-group">
+        <label>Enter Paid Amount (₹)</label>
+        <input type="number" id="payAmount" placeholder="e.g. 100">
+      </div>
+      <div class="form-group">
+        <label>Transaction / UTR Number</label>
+        <input type="text" id="utrNumber" placeholder="Enter 12-digit UTR">
+      </div>
+      <button class="submit-btn" style="background: var(--accent-green);" onclick="submitPayment()">Submit UTR on WhatsApp</button>
+    </div>
+  </div>
+
+  <script>
+    // आपका WhatsApp नंबर सेट कर दिया गया है
+    const ADMIN_WHATSAPP = "918094385548";
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function filterGames() {
+      const searchVal = document.getElementById('gameSearch').value.trim();
+      const cards = document.querySelectorAll('.game-card');
+      let visibleCount = 0;
+      cards.forEach(card => {
+        const cardAmount = card.getAttribute('data-amount');
+        if (searchVal === "" || cardAmount.includes(searchVal)) {
+          card.style.display = "flex";
+          visibleCount++;
+        } else {
+          card.style.display = "none";
+        }
+      });
+      document.getElementById('matchCount').innerText = visibleCount + " Matches Found";
+    }
+
+    function submitLogin() {
+      const name = document.getElementById('userName').value.trim();
+      const phone = document.getElementById('userPhone').value.trim();
+
+      if (name === "" || phone.length !== 10) {
+        alert("कृपया सही नाम और 10-अंकों का मोबाइल नंबर डालें!");
+        return;
+      }
+
+      const msg = encodeURIComponent(`*नया यूजर लॉगिन (Grain Adda)*\n👤 नाम: ${name}\n📞 मोबाइल: ${phone}`);
+      window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${msg}`, '_blank');
+      closeModal('loginModal');
+    }
+
+    function submitPayment() {
+      const amount = document.getElementById('payAmount').value.trim();
+      const utr = document.getElementById('utrNumber').value.trim();
+
+      if (amount === "" || utr === "") {
+        alert("कृपया अमाउंट और UTR नंबर भरें!");
+        return;
+      }
+
+      const msg = encodeURIComponent(`*नया पेमेंट डिपॉजिट (Grain Adda)*\n💰 अमाउंट: ₹${amount}\n🔢 UTR नंबर: ${utr}`);
+      window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${msg}`, '_blank');
+      closeModal('paymentModal');
+    }
+
+    function joinGame(amount, player) {
+      alert(`Joining match against ${player} for ₹${amount}.`);
+    }
+  </script>
+</body>
+</html>
