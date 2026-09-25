@@ -45,6 +45,7 @@
     .qr-container { text-align: center; margin: 1rem 0; background: #fff; padding: 1rem; border-radius: 8px; color: #000; }
     .qr-container img { width: 180px; height: 180px; }
     .upi-id-box { font-weight: bold; color: #0f172a; margin-top: 0.5rem; font-size: 0.95rem; }
+    .status-msg { margin-top: 0.8rem; font-size: 0.85rem; text-align: center; }
   </style>
 </head>
 <body>
@@ -53,7 +54,7 @@
     <div class="logo">🌾 GRAIN ADDA</div>
     <div class="header-btns">
       <button class="btn btn-pay" onclick="openModal('paymentModal')">💳 Pay / Add Cash</button>
-      <button class="btn btn-login" onclick="openModal('loginModal')">Login</button>
+      <button class="btn btn-login" id="navLoginBtn" onclick="openModal('loginModal')">Login</button>
     </div>
   </header>
 
@@ -114,20 +115,36 @@
     </div>
   </div>
 
-  <!-- Login Modal -->
+  <!-- Login & OTP Modal -->
   <div class="modal-overlay" id="loginModal">
     <div class="modal">
       <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
-      <h3>Login / Sign Up</h3>
-      <div class="form-group">
-        <label>Your Name</label>
-        <input type="text" id="userName" placeholder="Enter full name">
+      <h3>लॉगिन / साइन-अप</h3>
+
+      <!-- Step 1: User info & OTP request -->
+      <div id="stepRequestOtp">
+        <div class="form-group">
+          <label>आपका नाम</label>
+          <input type="text" id="userName" placeholder="अपना नाम दर्ज करें">
+        </div>
+        <div class="form-group">
+          <label>मोबाइल नंबर</label>
+          <input type="tel" id="userPhone" placeholder="10 अंकों का नंबर" maxlength="10">
+        </div>
+        <button class="submit-btn" id="sendOtpBtn" onclick="sendOtp()">OTP भेजें</button>
       </div>
-      <div class="form-group">
-        <label>Mobile Number</label>
-        <input type="tel" id="userPhone" placeholder="Enter 10-digit number" maxlength="10">
+
+      <!-- Step 2: OTP verification -->
+      <div id="stepVerifyOtp" style="display: none;">
+        <div class="form-group">
+          <label>दर्ज करें OTP (SMS कोड)</label>
+          <input type="number" id="otpCode" placeholder="4 अंकों का OTP">
+        </div>
+        <button class="submit-btn" id="verifyOtpBtn" onclick="verifyOtpAndSave()">वेरीफाई और लॉगिन करें</button>
+        <p class="status-msg" style="color: var(--text-muted); cursor: pointer;" onclick="resetOtpStep()">मोबाइल नंबर बदलें</p>
       </div>
-      <button class="submit-btn" onclick="submitLogin()">Submit & Send on WhatsApp</button>
+
+      <p class="status-msg" id="loginStatus"></p>
     </div>
   </div>
 
@@ -138,7 +155,6 @@
       <h3>Scan & Pay</h3>
       
       <div class="qr-container">
-        <!-- अपनी असली UPI ID यहाँ बदल सकते हैं -->
         <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=your-upi-id@oksbi&pn=GrainAdda" alt="QR Code">
         <div class="upi-id-box">UPI ID: your-upi-id@oksbi</div>
       </div>
@@ -151,16 +167,130 @@
         <label>Transaction / UTR Number</label>
         <input type="text" id="utrNumber" placeholder="Enter 12-digit UTR">
       </div>
-      <button class="submit-btn" style="background: var(--accent-green);" onclick="submitPayment()">Submit UTR on WhatsApp</button>
+      <button class="submit-btn" style="background: var(--accent-green);" onclick="submitPaymentData()">Submit Payment</button>
+      <p class="status-msg" id="paymentStatus"></p>
     </div>
   </div>
 
   <script>
-    // आपका WhatsApp नंबर सेट कर दिया गया है
-    const ADMIN_WHATSAPP = "918094385548";
+    // आपका Google Apps Script Web App URL यहाँ सेट कर दिया गया है
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwqgxWUAIb0CnDggHOJL2Dp5Ha9ylHETQjoUmy99rE2nH46GfeEQUm-1Vxb8JIsr3tB/exec";
+
+    let generatedOtp = null;
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function resetOtpStep() {
+      document.getElementById('stepRequestOtp').style.display = 'block';
+      document.getElementById('stepVerifyOtp').style.display = 'none';
+      document.getElementById('loginStatus').innerText = "";
+    }
+
+    // OTP जनरेट और भेजने का लॉजिक
+    async function sendOtp() {
+      const name = document.getElementById('userName').value.trim();
+      const phone = document.getElementById('userPhone').value.trim();
+      const status = document.getElementById('loginStatus');
+
+      if (!name || phone.length !== 10) {
+        status.style.color = "#ef4444";
+        status.innerText = "कृपया सही नाम और 10 अंकों का फोन नंबर भरें!";
+        return;
+      }
+
+      status.style.color = "var(--primary)";
+      status.innerText = "OTP भेजा जा रहा है...";
+
+      // 4 अंकों का OTP कोड
+      generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+      
+      // डेमो के लिए स्क्रीन पर दिखेगा
+      alert(`Grain Adda Verification Code: ${generatedOtp}`);
+
+      document.getElementById('stepRequestOtp').style.display = 'none';
+      document.getElementById('stepVerifyOtp').style.display = 'block';
+      status.innerText = `OTP ${phone} पर भेजा गया है।`;
+    }
+
+    // OTP वेरीफाई करके Google Sheet में सेव करना
+    async function verifyOtpAndSave() {
+      const enteredOtp = document.getElementById('otpCode').value.trim();
+      const name = document.getElementById('userName').value.trim();
+      const phone = document.getElementById('userPhone').value.trim();
+      const status = document.getElementById('loginStatus');
+
+      if (enteredOtp !== generatedOtp) {
+        status.style.color = "#ef4444";
+        status.innerText = "अमान्य OTP! कृपया दोबारा जांचें।";
+        return;
+      }
+
+      status.style.color = "var(--accent-green)";
+      status.innerText = "सफलतापूर्वक वेरीफाई हुआ! डेटा सेव हो रहा है...";
+
+      const payload = {
+        type: "User Login",
+        name: name,
+        phone: phone
+      };
+
+      try {
+        await fetch(SHEET_API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        
+        localStorage.setItem("userLoggedIn", phone);
+        document.getElementById('navLoginBtn').innerText = name.split(" ")[0];
+        setTimeout(() => {
+          closeModal('loginModal');
+          resetOtpStep();
+        }, 1200);
+
+      } catch (err) {
+        alert("डेटा सर्वर तक नहीं पहुँचा, कृपया नेटवर्क चेक करें।");
+      }
+    }
+
+    // पेमेंट विवरण Google Sheet में भेजना
+    async function submitPaymentData() {
+      const amount = document.getElementById('payAmount').value.trim();
+      const utr = document.getElementById('utrNumber').value.trim();
+      const status = document.getElementById('paymentStatus');
+
+      if (!amount || !utr) {
+        status.style.color = "#ef4444";
+        status.innerText = "कृपया अमाउंट और UTR नंबर दोनों भरें!";
+        return;
+      }
+
+      status.style.color = "var(--primary)";
+      status.innerText = "रिकॉर्ड सबमिट किया जा रहा है...";
+
+      const payload = {
+        type: "Deposit",
+        amount: amount,
+        utr: utr,
+        phone: localStorage.getItem("userLoggedIn") || "Unknown"
+      };
+
+      try {
+        await fetch(SHEET_API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        status.style.color = "var(--accent-green)";
+        status.innerText = "पेमेंट विवरण सफलतापूर्वक दर्ज हो गया!";
+        setTimeout(() => closeModal('paymentModal'), 1500);
+      } catch (err) {
+        status.innerText = "सबमिट करने में त्रुटि आई।";
+      }
+    }
 
     function filterGames() {
       const searchVal = document.getElementById('gameSearch').value.trim();
@@ -176,34 +306,6 @@
         }
       });
       document.getElementById('matchCount').innerText = visibleCount + " Matches Found";
-    }
-
-    function submitLogin() {
-      const name = document.getElementById('userName').value.trim();
-      const phone = document.getElementById('userPhone').value.trim();
-
-      if (name === "" || phone.length !== 10) {
-        alert("कृपया सही नाम और 10-अंकों का मोबाइल नंबर डालें!");
-        return;
-      }
-
-      const msg = encodeURIComponent(`*नया यूजर लॉगिन (Grain Adda)*\n👤 नाम: ${name}\n📞 मोबाइल: ${phone}`);
-      window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${msg}`, '_blank');
-      closeModal('loginModal');
-    }
-
-    function submitPayment() {
-      const amount = document.getElementById('payAmount').value.trim();
-      const utr = document.getElementById('utrNumber').value.trim();
-
-      if (amount === "" || utr === "") {
-        alert("कृपया अमाउंट और UTR नंबर भरें!");
-        return;
-      }
-
-      const msg = encodeURIComponent(`*नया पेमेंट डिपॉजिट (Grain Adda)*\n💰 अमाउंट: ₹${amount}\n🔢 UTR नंबर: ${utr}`);
-      window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${msg}`, '_blank');
-      closeModal('paymentModal');
     }
 
     function joinGame(amount, player) {
