@@ -3,313 +3,702 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GRAIN ADDA - Play Ludo Challenges & Win</title>
-  <meta name="description" content="Play online ludo challenges, 1v1 matches and classic tournaments on Grain Adda.">
+  <title>Grain Adda - Real Gaming Platform</title>
+  
+  <!-- Firebase Cloud SDKs for Realtime Multi-device Sync -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <style>
     :root {
-      --primary: #f59e0b;
-      --primary-hover: #d97706;
-      --bg-dark: #0b0f19;
-      --card-bg: #151d2d;
-      --accent-green: #10b981;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #26334a;
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --green: #15803d;
+      --green-light: #dcfce7;
+      --gold: #b45309;
+      --gold-light: #fef3c7;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text); padding-bottom: 70px; }
-    header { background: #111827; padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-    .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
-    .header-btns { display: flex; gap: 0.5rem; }
-    .btn { padding: 0.5rem 0.9rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.85rem; }
-    .btn-pay { background: var(--accent-green); color: #000; }
-    .btn-login { background: var(--primary); color: #000; }
-    .search-box { max-width: 600px; margin: 1.5rem auto 1rem; padding: 0 1rem; }
-    .search-input { width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: #fff; font-size: 1rem; outline: none; }
-    .container { max-width: 600px; margin: 0 auto; padding: 0 1rem; }
-    .section-title { font-size: 1.1rem; margin: 1.2rem 0 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
-    .game-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
-    .player-details h4 { font-size: 1rem; color: #fff; }
-    .player-details p { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-    .game-prize { text-align: right; }
-    .prize-amount { color: var(--accent-green); font-weight: bold; font-size: 1.1rem; }
-    .btn-play { background: var(--primary); color: #000; padding: 0.4rem 1rem; border-radius: 5px; border: none; font-weight: 700; margin-top: 0.3rem; cursor: pointer; }
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 200; padding: 1rem; }
-    .modal { background: #1e293b; padding: 1.5rem; border-radius: 12px; width: 100%; max-width: 380px; position: relative; }
-    .close-btn { position: absolute; top: 0.8rem; right: 1rem; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
-    .form-group { margin-top: 1rem; }
-    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
-    .form-group input { width: 100%; padding: 0.7rem; background: #0f172a; border: 1px solid var(--border); border-radius: 6px; color: #fff; outline: none; }
-    .submit-btn { width: 100%; margin-top: 1.2rem; padding: 0.8rem; background: var(--primary); color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
-    .qr-container { text-align: center; margin: 1rem 0; background: #fff; padding: 1rem; border-radius: 8px; color: #000; }
-    .qr-container img { width: 180px; height: 180px; }
-    .upi-id-box { font-weight: bold; color: #0f172a; margin-top: 0.5rem; font-size: 0.95rem; }
-    .status-msg { margin-top: 0.8rem; font-size: 0.85rem; text-align: center; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding-bottom: 70px;
+    }
+
+    /* Clean Compact Header */
+    header {
+      background: var(--card-bg);
+      padding: 0.6rem 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .logo-text {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chips-badge {
+      background: var(--gold-light);
+      border: 1px solid #fde68a;
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3rem 0.55rem;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .btn-action {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .btn-addcash {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn-login {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Container */
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0.8rem;
+    }
+
+    /* Match Actions Bar */
+    .action-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 0.8rem;
+    }
+
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.5rem 0.7rem;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .btn-create-match {
+      background: #0284c7;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 0 0.8rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Notice Banner */
+    .notice {
+      background: #e0f2fe;
+      border-left: 3px solid #0284c7;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.72rem;
+      color: #0369a1;
+      border-radius: 4px;
+      margin-bottom: 0.8rem;
+    }
+
+    /* Match List */
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .match-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .match-info h4 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .match-info .entry-tag {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .room-code-pill {
+      display: inline-block;
+      margin-top: 4px;
+      background: #f1f5f9;
+      border: 1px dashed #94a3b8;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .match-prize {
+      text-align: right;
+    }
+
+    .win-text {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .btn-play-game {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.35rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 3px;
+    }
+
+    .empty-state {
+      background: var(--card-bg);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    /* Real-Time Live Logs */
+    .admin-feed {
+      margin-top: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem;
+    }
+
+    .admin-feed h5 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .log-item {
+      font-size: 0.72rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      color: #334155;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      padding: 1rem;
+    }
+
+    .modal {
+      background: #ffffff;
+      padding: 1.2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 360px;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .modal h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      color: var(--text);
+    }
+
+    .btn-close {
+      position: absolute;
+      top: 0.8rem;
+      right: 0.9rem;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 0.7rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.55rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      margin-top: 0.4rem;
+    }
+
+    /* UPI QR Display */
+    .qr-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem;
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .qr-card img {
+      width: 150px;
+      height: 150px;
+      display: block;
+      margin: 0 auto;
+      border-radius: 6px;
+    }
+
+    .upi-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 0.4rem;
+      background: #e2e8f0;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
   <header>
-    <div class="logo">🌾 GRAIN ADDA</div>
-    <div class="header-btns">
-      <button class="btn btn-pay" onclick="openModal('paymentModal')">💳 Pay / Add Cash</button>
-      <button class="btn btn-login" id="navLoginBtn" onclick="openModal('loginModal')">Login</button>
+    <div class="logo-box">
+      <span style="font-size: 1.1rem;">🌾</span>
+      <span class="logo-text">GRAIN ADDA</span>
+    </div>
+
+    <div class="header-actions">
+      <!-- Real-time Chips / Balance -->
+      <div class="chips-badge">
+        🪙 <span id="chipsBalance">0</span> Chips
+      </div>
+      <button class="btn-action btn-addcash" onclick="openModal('cashModal')">+ Cash</button>
+      <button class="btn-action btn-login" id="loginHeaderBtn" onclick="openModal('authModal')">Login</button>
     </div>
   </header>
 
-  <div class="search-box">
-    <input type="number" id="gameSearch" class="search-input" placeholder="🔍 Search game amount (e.g. 50, 100)..." onkeyup="filterGames()">
-  </div>
-
   <div class="container">
+    <!-- Notice -->
+    <div class="notice">
+      ⚡ <strong>Real-Time Mode Active:</strong> केवल लाइव खिलाड़ियों के बनाए मैच ही यहाँ दिखेंगे।
+    </div>
+
+    <!-- Match Actions -->
+    <div class="action-bar">
+      <div class="search-box">
+        <input type="number" id="filterInput" placeholder="🔍 Search Amount (₹50, 100...)" oninput="filterMatches()">
+      </div>
+      <button class="btn-create-match" onclick="openCreateMatch()">+ Create Match</button>
+    </div>
+
+    <!-- Live Matches Heading -->
     <div class="section-title">
-      <span>Available Challenges</span>
-      <span id="matchCount">4 Matches Found</span>
+      <span>Live Challenges</span>
+      <span id="matchStats">0 Available</span>
     </div>
 
-    <div id="gamesContainer">
-      <div class="game-card" data-amount="50">
-        <div class="player-details">
-          <h4>Player: Rahul_Ludo</h4>
-          <p>Entry Fee: <strong>₹50</strong> | Mode: Classic</p>
-        </div>
-        <div class="game-prize">
-          <div class="prize-amount">Win: ₹90</div>
-          <button class="btn-play" onclick="joinGame(50, 'Rahul_Ludo')">Play</button>
-        </div>
+    <!-- Matches List Container -->
+    <div id="matchContainer">
+      <div class="empty-state">
+        लोड हो रहा है... या अभी कोई मैच नहीं है।<br>
+        <strong>+ Create Match</strong> पर क्लिक करके नया मैच बनाएं!
       </div>
+    </div>
 
-      <div class="game-card" data-amount="100">
-        <div class="player-details">
-          <h4>Player: Aman_King</h4>
-          <p>Entry Fee: <strong>₹100</strong> | Mode: 1v1 Quick</p>
-        </div>
-        <div class="game-prize">
-          <div class="prize-amount">Win: ₹180</div>
-          <button class="btn-play" onclick="joinGame(100, 'Aman_King')">Play</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-amount="200">
-        <div class="player-details">
-          <h4>Player: Vicky_Star</h4>
-          <p>Entry Fee: <strong>₹200</strong> | Mode: Classic</p>
-        </div>
-        <div class="game-prize">
-          <div class="prize-amount">Win: ₹360</div>
-          <button class="btn-play" onclick="joinGame(200, 'Vicky_Star')">Play</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-amount="500">
-        <div class="player-details">
-          <h4>Player: Boss_007</h4>
-          <p>Entry Fee: <strong>₹500</strong> | Mode: Pro Match</p>
-        </div>
-        <div class="game-prize">
-          <div class="prize-amount">Win: ₹900</div>
-          <button class="btn-play" onclick="joinGame(500, 'Boss_007')">Play</button>
-        </div>
+    <!-- Real-time Activity / Admin Stream -->
+    <div class="admin-feed">
+      <h5>⚡ Live Network Activity</h5>
+      <div id="logStream">
+        <div class="log-item"><span>Platform Synced</span><span>Live</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Login & OTP Modal -->
-  <div class="modal-overlay" id="loginModal">
+  <!-- Modal 1: Login -->
+  <div class="modal-overlay" id="authModal">
     <div class="modal">
-      <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
-      <h3>लॉगिन / साइन-अप</h3>
-
-      <!-- Step 1: User info & OTP request -->
-      <div id="stepRequestOtp">
-        <div class="form-group">
-          <label>आपका नाम</label>
-          <input type="text" id="userName" placeholder="अपना नाम दर्ज करें">
-        </div>
-        <div class="form-group">
-          <label>मोबाइल नंबर</label>
-          <input type="tel" id="userPhone" placeholder="10 अंकों का नंबर" maxlength="10">
-        </div>
-        <button class="submit-btn" id="sendOtpBtn" onclick="sendOtp()">OTP भेजें</button>
+      <button class="btn-close" onclick="closeModal('authModal')">&times;</button>
+      <h3>Player Login / Profile</h3>
+      <div class="form-group">
+        <label>Player Name</label>
+        <input type="text" id="playerName" placeholder="Enter your display name">
       </div>
-
-      <!-- Step 2: OTP verification -->
-      <div id="stepVerifyOtp" style="display: none;">
-        <div class="form-group">
-          <label>दर्ज करें OTP (SMS कोड)</label>
-          <input type="number" id="otpCode" placeholder="4 अंकों का OTP">
-        </div>
-        <button class="submit-btn" id="verifyOtpBtn" onclick="verifyOtpAndSave()">वेरीफाई और लॉगिन करें</button>
-        <p class="status-msg" style="color: var(--text-muted); cursor: pointer;" onclick="resetOtpStep()">मोबाइल नंबर बदलें</p>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="tel" id="playerMobile" placeholder="10-digit number" maxlength="10">
       </div>
-
-      <p class="status-msg" id="loginStatus"></p>
+      <button class="btn-submit" style="background: var(--primary); color: #fff;" onclick="handleLogin()">Save & Login</button>
     </div>
   </div>
 
-  <!-- Payment Modal -->
-  <div class="modal-overlay" id="paymentModal">
+  <!-- Modal 2: Create Match -->
+  <div class="modal-overlay" id="matchModal">
     <div class="modal">
-      <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
-      <h3>Scan & Pay</h3>
-      
-      <div class="qr-container">
-        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=your-upi-id@oksbi&pn=GrainAdda" alt="QR Code">
-        <div class="upi-id-box">UPI ID: your-upi-id@oksbi</div>
+      <button class="btn-close" onclick="closeModal('matchModal')">&times;</button>
+      <h3>Create Ludo Challenge</h3>
+      <div class="form-group">
+        <label>Entry Fee (Chips / ₹)</label>
+        <input type="number" id="entryFee" placeholder="e.g. 50, 100, 250">
+      </div>
+      <div class="form-group">
+        <label>Ludo King Room Code</label>
+        <input type="text" id="roomCode" placeholder="Enter 8-digit Room Code">
+      </div>
+      <button class="btn-submit" style="background: #0284c7; color: #fff;" onclick="publishMatch()">Post Challenge</button>
+    </div>
+  </div>
+
+  <!-- Modal 3: Deposit with UPI QR -->
+  <div class="modal-overlay" id="cashModal">
+    <div class="modal">
+      <button class="btn-close" onclick="closeModal('cashModal')">&times;</button>
+      <h3>Add Cash / Deposit Chips</h3>
+
+      <div class="qr-card">
+        <!-- Direct QR code for 8094385548@axl -->
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=8094385548@axl&pn=GrainAdda" alt="UPI QR">
+        <div class="upi-tag">UPI: 8094385548@axl</div>
       </div>
 
       <div class="form-group">
-        <label>Enter Paid Amount (₹)</label>
-        <input type="number" id="payAmount" placeholder="e.g. 100">
+        <label>Amount Paid (₹)</label>
+        <input type="number" id="cashAmount" placeholder="Enter amount (e.g. 100)">
       </div>
       <div class="form-group">
-        <label>Transaction / UTR Number</label>
-        <input type="text" id="utrNumber" placeholder="Enter 12-digit UTR">
+        <label>12-Digit UTR / Transaction Ref</label>
+        <input type="text" id="utrRef" placeholder="Enter UTR from PhonePe/GPay">
       </div>
-      <button class="submit-btn" style="background: var(--accent-green);" onclick="submitPaymentData()">Submit Payment</button>
-      <p class="status-msg" id="paymentStatus"></p>
+      <button class="btn-submit" style="background: var(--green); color: #fff;" onclick="handleDeposit()">Submit Deposit</button>
     </div>
   </div>
 
   <script>
-    // आपका Google Apps Script Web App URL यहाँ सेट कर दिया गया है
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwqgxWUAIb0CnDggHOJL2Dp5Ha9ylHETQjoUmy99rE2nH46GfeEQUm-1Vxb8JIsr3tB/exec";
+    // 1. Firebase Config for Free Real-Time Sync across multiple phones
+    const firebaseConfig = {
+      databaseURL: "https://grain-adda-live-default-rtdb.firebaseio.com/"
+    };
+    
+    let db = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+    } catch(e) {
+      console.log("Offline mode fallback");
+    }
 
-    let generatedOtp = null;
+    // Local State
+    let user = JSON.parse(localStorage.getItem('grain_session')) || null;
+    let localMatches = [];
+
+    window.onload = function() {
+      updateUserHeader();
+      startRealtimeSync();
+    };
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    function resetOtpStep() {
-      document.getElementById('stepRequestOtp').style.display = 'block';
-      document.getElementById('stepVerifyOtp').style.display = 'none';
-      document.getElementById('loginStatus').innerText = "";
-    }
+    // User Authentication
+    function handleLogin() {
+      const name = document.getElementById('playerName').value.trim();
+      const mobile = document.getElementById('playerMobile').value.trim();
 
-    // OTP जनरेट और भेजने का लॉजिक
-    async function sendOtp() {
-      const name = document.getElementById('userName').value.trim();
-      const phone = document.getElementById('userPhone').value.trim();
-      const status = document.getElementById('loginStatus');
-
-      if (!name || phone.length !== 10) {
-        status.style.color = "#ef4444";
-        status.innerText = "कृपया सही नाम और 10 अंकों का फोन नंबर भरें!";
+      if (!name || mobile.length !== 10) {
+        alert("कृपया सही नाम और 10-अंकों का मोबाइल नंबर भरें!");
         return;
       }
 
-      status.style.color = "var(--primary)";
-      status.innerText = "OTP भेजा जा रहा है...";
+      user = { name, mobile, chips: 0 };
+      localStorage.setItem('grain_session', JSON.stringify(user));
+      updateUserHeader();
+      closeModal('authModal');
+      broadcastLog(`Player Joined: ${name}`);
 
-      // 4 अंकों का OTP कोड
-      generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-      
-      // डेमो के लिए स्क्रीन पर दिखेगा
-      alert(`Grain Adda Verification Code: ${generatedOtp}`);
-
-      document.getElementById('stepRequestOtp').style.display = 'none';
-      document.getElementById('stepVerifyOtp').style.display = 'block';
-      status.innerText = `OTP ${phone} पर भेजा गया है।`;
+      // Sync user to cloud
+      if(db) db.ref('users/' + mobile).set(user);
     }
 
-    // OTP वेरीफाई करके Google Sheet में सेव करना
-    async function verifyOtpAndSave() {
-      const enteredOtp = document.getElementById('otpCode').value.trim();
-      const name = document.getElementById('userName').value.trim();
-      const phone = document.getElementById('userPhone').value.trim();
-      const status = document.getElementById('loginStatus');
+    function updateUserHeader() {
+      const loginBtn = document.getElementById('loginHeaderBtn');
+      const chipsEl = document.getElementById('chipsBalance');
 
-      if (enteredOtp !== generatedOtp) {
-        status.style.color = "#ef4444";
-        status.innerText = "अमान्य OTP! कृपया दोबारा जांचें।";
+      if (user) {
+        loginBtn.innerText = user.name.slice(0, 6) + "✓";
+        chipsEl.innerText = user.chips || 0;
+      } else {
+        loginBtn.innerText = "Login";
+        chipsEl.innerText = "0";
+      }
+    }
+
+    // Open Match Creation Check
+    function openCreateMatch() {
+      if (!user) {
+        alert("मैच बनाने के लिए पहले Login करें!");
+        openModal('authModal');
+        return;
+      }
+      openModal('matchModal');
+    }
+
+    // Create & Publish Match to Cloud
+    function publishMatch() {
+      const fee = parseInt(document.getElementById('entryFee').value);
+      const code = document.getElementById('roomCode').value.trim();
+
+      if (!fee || fee <= 0 || !code) {
+        alert("कृपया सही अमाउंट और Ludo Room Code दोनों दर्ज करें!");
         return;
       }
 
-      status.style.color = "var(--accent-green)";
-      status.innerText = "सफलतापूर्वक वेरीफाई हुआ! डेटा सेव हो रहा है...";
-
-      const payload = {
-        type: "User Login",
-        name: name,
-        phone: phone
+      const matchId = 'm_' + Date.now();
+      const matchData = {
+        id: matchId,
+        host: user.name,
+        mobile: user.mobile,
+        amount: fee,
+        prize: Math.floor(fee * 1.8),
+        roomCode: code,
+        timestamp: Date.now()
       };
 
-      try {
-        await fetch(SHEET_API_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        
-        localStorage.setItem("userLoggedIn", phone);
-        document.getElementById('navLoginBtn').innerText = name.split(" ")[0];
-        setTimeout(() => {
-          closeModal('loginModal');
-          resetOtpStep();
-        }, 1200);
-
-      } catch (err) {
-        alert("डेटा सर्वर तक नहीं पहुँचा, कृपया नेटवर्क चेक करें।");
+      if (db) {
+        db.ref('matches/' + matchId).set(matchData);
+      } else {
+        localMatches.unshift(matchData);
+        renderMatchCards(localMatches);
       }
+
+      broadcastLog(`Match Created: ₹${fee} by ${user.name}`);
+      closeModal('matchModal');
+      document.getElementById('entryFee').value = '';
+      document.getElementById('roomCode').value = '';
     }
 
-    // पेमेंट विवरण Google Sheet में भेजना
-    async function submitPaymentData() {
-      const amount = document.getElementById('payAmount').value.trim();
-      const utr = document.getElementById('utrNumber').value.trim();
-      const status = document.getElementById('paymentStatus');
+    // Realtime Sync Listener (works across all phones)
+    function startRealtimeSync() {
+      if (!db) return;
 
-      if (!amount || !utr) {
-        status.style.color = "#ef4444";
-        status.innerText = "कृपया अमाउंट और UTR नंबर दोनों भरें!";
-        return;
-      }
+      db.ref('matches').on('value', (snapshot) => {
+        const data = snapshot.val();
+        localMatches = [];
+        if (data) {
+          Object.keys(data).forEach(k => localMatches.unshift(data[k]));
+        }
+        renderMatchCards(localMatches);
+      });
 
-      status.style.color = "var(--primary)";
-      status.innerText = "रिकॉर्ड सबमिट किया जा रहा है...";
-
-      const payload = {
-        type: "Deposit",
-        amount: amount,
-        utr: utr,
-        phone: localStorage.getItem("userLoggedIn") || "Unknown"
-      };
-
-      try {
-        await fetch(SHEET_API_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        status.style.color = "var(--accent-green)";
-        status.innerText = "पेमेंट विवरण सफलतापूर्वक दर्ज हो गया!";
-        setTimeout(() => closeModal('paymentModal'), 1500);
-      } catch (err) {
-        status.innerText = "सबमिट करने में त्रुटि आई।";
-      }
-    }
-
-    function filterGames() {
-      const searchVal = document.getElementById('gameSearch').value.trim();
-      const cards = document.querySelectorAll('.game-card');
-      let visibleCount = 0;
-      cards.forEach(card => {
-        const cardAmount = card.getAttribute('data-amount');
-        if (searchVal === "" || cardAmount.includes(searchVal)) {
-          card.style.display = "flex";
-          visibleCount++;
-        } else {
-          card.style.display = "none";
+      db.ref('activity').limitToLast(5).on('value', (snapshot) => {
+        const stream = document.getElementById('logStream');
+        stream.innerHTML = '';
+        const data = snapshot.val();
+        if (data) {
+          Object.keys(data).forEach(k => {
+            const item = document.createElement('div');
+            item.className = 'log-item';
+            item.innerHTML = `<span>${data[k].text}</span><span>${data[k].time}</span>`;
+            stream.prepend(item);
+          });
         }
       });
-      document.getElementById('matchCount').innerText = visibleCount + " Matches Found";
     }
 
-    function joinGame(amount, player) {
-      alert(`Joining match against ${player} for ₹${amount}.`);
+    // Render Function
+    function renderMatchCards(list) {
+      const container = document.getElementById('matchContainer');
+      const stats = document.getElementById('matchStats');
+      const filter = document.getElementById('filterInput').value.trim();
+
+      let displayList = list;
+      if (filter) {
+        displayList = list.filter(m => m.amount.toString().includes(filter));
+      }
+
+      stats.innerText = `${displayList.length} Available`;
+
+      if (displayList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            अभी कोई लाइव मैच नहीं है।<br>
+            <strong>+ Create Match</strong> दबाकर पहला मैच आप ही बनाएं!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      displayList.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+        card.innerHTML = `
+          <div class="match-info">
+            <h4>Host: ${m.host}</h4>
+            <div class="entry-tag">Entry: <strong>₹${m.amount} Chips</strong></div>
+            <div class="room-code-pill">Room Code: ${m.roomCode}</div>
+          </div>
+          <div class="match-prize">
+            <div class="win-text">Win: ₹${m.prize}</div>
+            <button class="btn-play-game" onclick="joinGameCode('${m.roomCode}', ${m.amount})">Play / Join</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterMatches() {
+      renderMatchCards(localMatches);
+    }
+
+    function joinGameCode(code, amt) {
+      if (!user) {
+        alert("जॉइन करने के लिए पहले Login करें!");
+        openModal('authModal');
+        return;
+      }
+      navigator.clipboard.writeText(code).then(() => {
+        alert(`Room Code [${code}] कॉपी हो गया है!\nLudo King ऐप में जाकर तुरंत पेस्ट करें।`);
+      }).catch(() => {
+        alert("Ludo Room Code: " + code);
+      });
+      broadcastLog(`${user.name} joined match for ₹${amt}`);
+    }
+
+    // Deposit Chips via UPI
+    function handleDeposit() {
+      const amt = parseInt(document.getElementById('cashAmount').value);
+      const utr = document.getElementById('utrRef').value.trim();
+
+      if (!amt || !utr || utr.length < 4) {
+        alert("कृपया सही अमाउंट और UTR नंबर भरें!");
+        return;
+      }
+
+      if (user) {
+        user.chips = (user.chips || 0) + amt;
+        localStorage.setItem('grain_session', JSON.stringify(user));
+        updateUserHeader();
+      }
+
+      broadcastLog(`Deposit: +₹${amt} (UTR: ${utr.slice(-4)})`);
+      alert(`₹${amt} के चिप्स ऐड करने की रिक्वेस्ट दर्ज हो गई है!`);
+      closeModal('cashModal');
+      document.getElementById('cashAmount').value = '';
+      document.getElementById('utrRef').value = '';
+    }
+
+    function broadcastLog(text) {
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (db) {
+        db.ref('activity').push({ text, time });
+      }
     }
   </script>
 </body>
